@@ -1,16 +1,14 @@
 {
-  "project_id": "votre-projet-gcp",
-  "location": "us-central1",
-  "processor_id": "votre-processor-id",
-  "model_name": "gemini-1.5-flash-002",
-  "temperature": 0.0,
-  "max_output_tokens": 8192,
   "document_types": [
     "passport",
-    "national_id",
+    "national_id_card",
     "drivers_license",
     "utility_bill",
     "bank_statement",
     "iban_document"
-  ]
+  ],
+  "business_rules": {
+    "justificatif_max_age_days": 90,
+    "iban_validation_enabled": true
+  }
 }

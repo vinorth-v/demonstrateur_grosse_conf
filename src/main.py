@@ -6,8 +6,13 @@ Exemple d'utilisation pour la conférence!
 
 import sys
 
+from dotenv import load_dotenv
+
 from chains.llm_chain import KYCDocumentChain
 from pipeline import KYCPipeline
+
+# Charger les variables d'environnement depuis .env
+load_dotenv()
 
 
 def demo_document_unique(image_path: str):
@@ -30,8 +35,17 @@ def demo_document_unique(image_path: str):
         # Afficher selon le type
         if result.carte_identite:
             cni = result.carte_identite
-            print(f"📄 Carte d'Identité de {cni.prenom} {cni.nom}")
-            print(f"   Né(e) le: {cni.date_naissance}")
+            # Accord du participe passé selon le sexe
+            ne_text = "Né.e"
+            if cni.sexe:
+                if cni.sexe.value == "M":
+                    ne_text = "Né"
+                elif cni.sexe.value == "F":
+                    ne_text = "Née"
+                print(f"📄 Carte d'Identité de {cni.prenom} {cni.nom} ({cni.sexe.value})")
+            else:
+                print(f"📄 Carte d'Identité de {cni.prenom} {cni.nom}")
+            print(f"   {ne_text} le: {cni.date_naissance}")
             print(f"   N° document: {cni.numero_document}")
             print(f"   Valide jusqu'au: {cni.date_expiration}")
             print(f"   Statut: {'✓ Valide' if cni.est_valide else '✗ Expirée'}")
@@ -59,9 +73,7 @@ def demo_document_unique(image_path: str):
             print(f"            {jd.code_postal} {jd.ville}")
             print(f"   Date: {jd.date_document}")
             print(f"   Émetteur: {jd.emetteur}")
-            print(
-                f"   Statut: {'✓ Récent (< 3 mois)' if jd.est_recent else '✗ Trop ancien'}"
-            )
+            print(f"   Statut: {'✓ Récent (< 3 mois)' if jd.est_recent else '✗ Trop ancien'}")
 
         elif result.rib:
             rib = result.rib
@@ -70,14 +82,12 @@ def demo_document_unique(image_path: str):
             print(f"   IBAN: {rib.iban}")
             print(f"   BIC: {rib.bic}")
             print(f"   Banque: {rib.nom_banque}")
-            print(
-                f"   Checksum IBAN: {'✓ Valide' if rib.iban_valide else '✗ Invalide'}"
-            )
+            print(f"   Checksum IBAN: {'✓ Valide' if rib.iban_valide else '✗ Invalide'}")
             print("   ⭐ L'IBAN a été validé avec l'algorithme modulo 97!")
     else:
         print("\n❌ ÉCHEC DE L'EXTRACTION\n")
-        for erreur in result.erreurs:
-            print(f"   - {erreur}")
+        if result.erreur:
+            print(f"   - {result.erreur}")
 
 
 def demo_dossier_complet(folder_path: str):

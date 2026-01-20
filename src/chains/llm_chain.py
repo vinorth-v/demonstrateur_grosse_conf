@@ -10,8 +10,8 @@ from pathlib import Path
 import vertexai
 from vertexai.generative_models import GenerationConfig, GenerativeModel, Part
 
-from .configuration import Configuration
-from .prompts import (
+from chains.configuration import Configuration
+from chains.prompts import (
     PROMPT_CLASSIFICATION,
     PROMPT_EXTRACTION_CNI,
     PROMPT_EXTRACTION_JUSTIFICATIF,
@@ -19,7 +19,7 @@ from .prompts import (
     PROMPT_EXTRACTION_PERMIS,
     PROMPT_EXTRACTION_RIB,
 )
-from .schemas import (
+from chains.schemas import (
     RIB,
     CarteIdentite,
     ClassificationDocument,
@@ -90,7 +90,72 @@ class KYCDocumentChain:
 
         return Part.from_data(data=image_bytes, mime_type=mime_type)
 
-    def classify_document(self, image_path: str | Path) -> ClassificationDocument:
+    def _extract_token_usage(self, response) -> dict[str, int] | None:
+        """
+        Extrait les informations d'utilisation des tokens depuis la réponse.
+
+        Args:
+            response: Réponse du modèle
+
+        Returns:
+            Dictionnaire avec les informations de tokens ou None
+        """
+        try:
+            if hasattr(response, "usage_metadata"):
+                usage = response.usage_metadata
+                input_tok = usage.prompt_token_count if hasattr(usage, "prompt_token_count") else 0
+                output_tok = (
+                    usage.candidates_token_count if hasattr(usage, "candidates_token_count") else 0
+                )
+                total_tok = (
+                    usage.total_token_count
+                    if hasattr(usage, "total_token_count")
+                    else input_tok + output_tok
+                )
+
+                calculated_total = input_tok + output_tok
+                overhead = total_tok - calculated_total if total_tok > calculated_total else 0
+
+                return {
+                    "input_tokens": input_tok,
+                    "output_tokens": output_tok,
+                    "total_tokens": total_tok,
+                    "overhead_tokens": overhead,
+                }
+        except Exception:
+            pass
+        return None
+
+    def _log_token_usage(self, document_type: str, token_usage: dict):
+        """Log les statistiques de tokens pour un document."""
+        if not token_usage:
+            return
+
+        input_tok = token_usage.get("input_tokens", 0)
+        output_tok = token_usage.get("output_tokens", 0)
+        total_tok = token_usage.get("total_tokens", 0)
+        overhead_tok = token_usage.get("overhead_tokens", 0)
+
+        # Calculer le coût
+        input_cost = (input_tok / 1_000_000) * self.config.INPUT_TOKEN_PRICE_PER_MILLION
+        output_cost = (output_tok / 1_000_000) * self.config.OUTPUT_TOKEN_PRICE_PER_MILLION
+        total_cost = input_cost + output_cost
+
+        if overhead_tok > 0:
+            print(
+                f"   💰 Tokens {document_type}: "
+                f"input={input_tok}, output={output_tok}, total={total_tok} "
+                f"(overhead: {overhead_tok}) | Coût: ${total_cost:.6f}"
+            )
+        else:
+            print(
+                f"   💰 Tokens {document_type}: "
+                f"input={input_tok}, output={output_tok}, total={total_tok} | Coût: ${total_cost:.6f}"
+            )
+
+    def classify_document(
+        self, image_path: str | Path
+    ) -> tuple[ClassificationDocument, dict | None]:
         """
         Classifie le type de document.
 
@@ -98,7 +163,7 @@ class KYCDocumentChain:
             image_path: Chemin vers l'image du document
 
         Returns:
-            Résultat de classification
+            Tuple (Résultat de classification, token_usage)
         """
         image_part = self._load_image(image_path)
 
@@ -107,11 +172,16 @@ class KYCDocumentChain:
             generation_config=self.generation_config,
         )
 
+        # Extraire les tokens
+        token_usage = self._extract_token_usage(response)
+        if token_usage:
+            self._log_token_usage("Classification", token_usage)
+
         # Parser la réponse JSON
         result_json = json.loads(response.text)
-        return ClassificationDocument(**result_json)
+        return ClassificationDocument(**result_json), token_usage
 
-    def extract_cni(self, image_path: str | Path) -> CarteIdentite:
+    def extract_cni(self, image_path: str | Path) -> tuple[CarteIdentite, dict | None]:
         """
         Extrait les données d'une Carte Nationale d'Identité.
 
@@ -119,7 +189,7 @@ class KYCDocumentChain:
             image_path: Chemin vers l'image
 
         Returns:
-            Données structurées de la CNI
+            Tuple (Données structurées de la CNI, token_usage)
         """
         image_part = self._load_image(image_path)
 
@@ -128,10 +198,15 @@ class KYCDocumentChain:
             generation_config=self.generation_config,
         )
 
-        result_json = json.loads(response.text)
-        return CarteIdentite(**result_json)
+        # Extraire les tokens
+        token_usage = self._extract_token_usage(response)
+        if token_usage:
+            self._log_token_usage("Extraction CNI", token_usage)
 
-    def extract_passeport(self, image_path: str | Path) -> Passeport:
+        result_json = json.loads(response.text)
+        return CarteIdentite(**result_json), token_usage
+
+    def extract_passeport(self, image_path: str | Path) -> tuple[Passeport, dict | None]:
         """
         Extrait les données d'un passeport.
 
@@ -139,7 +214,7 @@ class KYCDocumentChain:
             image_path: Chemin vers l'image
 
         Returns:
-            Données structurées du passeport
+            Tuple (Données structurées du passeport, token_usage)
         """
         image_part = self._load_image(image_path)
 
@@ -148,10 +223,15 @@ class KYCDocumentChain:
             generation_config=self.generation_config,
         )
 
-        result_json = json.loads(response.text)
-        return Passeport(**result_json)
+        # Extraire les tokens
+        token_usage = self._extract_token_usage(response)
+        if token_usage:
+            self._log_token_usage("Extraction Passeport", token_usage)
 
-    def extract_permis(self, image_path: str | Path) -> PermisConduire:
+        result_json = json.loads(response.text)
+        return Passeport(**result_json), token_usage
+
+    def extract_permis(self, image_path: str | Path) -> tuple[PermisConduire, dict | None]:
         """
         Extrait les données d'un permis de conduire.
 
@@ -161,7 +241,7 @@ class KYCDocumentChain:
             image_path: Chemin vers l'image
 
         Returns:
-            Données structurées du permis
+            Tuple (Données structurées du permis, token_usage)
         """
         image_part = self._load_image(image_path)
 
@@ -170,10 +250,17 @@ class KYCDocumentChain:
             generation_config=self.generation_config,
         )
 
-        result_json = json.loads(response.text)
-        return PermisConduire(**result_json)
+        # Extraire les tokens
+        token_usage = self._extract_token_usage(response)
+        if token_usage:
+            self._log_token_usage("Extraction Permis", token_usage)
 
-    def extract_justificatif(self, image_path: str | Path) -> JustificatifDomicile:
+        result_json = json.loads(response.text)
+        return PermisConduire(**result_json), token_usage
+
+    def extract_justificatif(
+        self, image_path: str | Path
+    ) -> tuple[JustificatifDomicile, dict | None]:
         """
         Extrait les données d'un justificatif de domicile.
 
@@ -181,7 +268,7 @@ class KYCDocumentChain:
             image_path: Chemin vers l'image
 
         Returns:
-            Données structurées du justificatif
+            Tuple (Données structurées du justificatif, token_usage)
         """
         image_part = self._load_image(image_path)
 
@@ -190,10 +277,15 @@ class KYCDocumentChain:
             generation_config=self.generation_config,
         )
 
-        result_json = json.loads(response.text)
-        return JustificatifDomicile(**result_json)
+        # Extraire les tokens
+        token_usage = self._extract_token_usage(response)
+        if token_usage:
+            self._log_token_usage("Extraction Justificatif", token_usage)
 
-    def extract_rib(self, image_path: str | Path) -> RIB:
+        result_json = json.loads(response.text)
+        return JustificatifDomicile(**result_json), token_usage
+
+    def extract_rib(self, image_path: str | Path) -> tuple[RIB, dict | None]:
         """
         Extrait les données d'un RIB.
 
@@ -203,7 +295,7 @@ class KYCDocumentChain:
             image_path: Chemin vers l'image
 
         Returns:
-            Données structurées du RIB
+            Tuple (Données structurées du RIB, token_usage)
         """
         image_part = self._load_image(image_path)
 
@@ -212,8 +304,13 @@ class KYCDocumentChain:
             generation_config=self.generation_config,
         )
 
+        # Extraire les tokens
+        token_usage = self._extract_token_usage(response)
+        if token_usage:
+            self._log_token_usage("Extraction RIB", token_usage)
+
         result_json = json.loads(response.text)
-        return RIB(**result_json)
+        return RIB(**result_json), token_usage
 
     def process_document(self, image_path: str | Path) -> ResultatExtractionKYC:
         """
@@ -229,32 +326,61 @@ class KYCDocumentChain:
         """
         erreurs = []
         avertissements = []
+        total_tokens_usage = {
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "total_tokens": 0,
+            "overhead_tokens": 0,
+        }
 
         try:
             # 1. Classification
             print(f"🔍 Classification du document: {image_path}")
-            classification = self.classify_document(image_path)
+            classification, token_usage_classification = self.classify_document(image_path)
             print(
                 f"   ✓ Type détecté: {classification.type_detecte.value} "
                 f"(confiance: {classification.confiance:.2%})"
             )
 
+            # Accumuler les tokens de classification
+            if token_usage_classification:
+                for key in total_tokens_usage:
+                    total_tokens_usage[key] += token_usage_classification.get(key, 0)
+
             # 2. Extraction selon le type
             print("📄 Extraction des données...")
             extraction_result = None
+            token_usage_extraction = None
 
             if classification.type_detecte == TypeDocument.CARTE_IDENTITE:
-                extraction_result = self.extract_cni(image_path)
+                extraction_result, token_usage_extraction = self.extract_cni(image_path)
             elif classification.type_detecte == TypeDocument.PASSEPORT:
-                extraction_result = self.extract_passeport(image_path)
+                extraction_result, token_usage_extraction = self.extract_passeport(image_path)
             elif classification.type_detecte == TypeDocument.PERMIS_CONDUIRE:
-                extraction_result = self.extract_permis(image_path)
+                extraction_result, token_usage_extraction = self.extract_permis(image_path)
             elif classification.type_detecte == TypeDocument.JUSTIFICATIF_DOMICILE:
-                extraction_result = self.extract_justificatif(image_path)
+                extraction_result, token_usage_extraction = self.extract_justificatif(image_path)
             elif classification.type_detecte == TypeDocument.RIB:
-                extraction_result = self.extract_rib(image_path)
+                extraction_result, token_usage_extraction = self.extract_rib(image_path)
+
+            # Accumuler les tokens d'extraction
+            if token_usage_extraction:
+                for key in total_tokens_usage:
+                    total_tokens_usage[key] += token_usage_extraction.get(key, 0)
 
             print("   ✓ Extraction réussie")
+
+            # Afficher le total des tokens et coût pour ce document
+            if total_tokens_usage["total_tokens"] > 0:
+                total_cost = (
+                    total_tokens_usage["input_tokens"] / 1_000_000
+                ) * self.config.INPUT_TOKEN_PRICE_PER_MILLION + (
+                    total_tokens_usage["output_tokens"] / 1_000_000
+                ) * self.config.OUTPUT_TOKEN_PRICE_PER_MILLION
+                print(
+                    f"   📊 Total tokens: {total_tokens_usage['total_tokens']} | "
+                    f"Coût total: ${total_cost:.6f}"
+                )
 
             # 3. Construction du résultat
             result = ResultatExtractionKYC(

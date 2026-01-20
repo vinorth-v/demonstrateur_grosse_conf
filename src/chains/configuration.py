@@ -5,6 +5,7 @@ Basé sur Vertex AI (Google Cloud).
 """
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -31,27 +32,31 @@ class Configuration:
     @property
     def project_id(self) -> str:
         """ID du projet Google Cloud."""
-        return self._config["project_id"]
+        return os.getenv("VAR_LLM_PROJECT_ID", os.getenv("GCP_PROJECT_ID", ""))
 
     @property
     def location(self) -> str:
         """Région Google Cloud."""
-        return self._config["location"]
+        return os.getenv("VAR_LLM_REGION", os.getenv("GCP_LOCATION", ""))
 
     @property
     def model(self) -> str:
         """Modèle Vertex AI à utiliser."""
-        return self._config["model"]
+        return os.getenv("VAR_LLM_MODELE", os.getenv("MODEL_NAME", "gemini-1.5-flash-002"))
 
     @property
     def temperature(self) -> float:
         """Température pour la génération."""
-        return self._config["temperature"]
+        return float(os.getenv("VAR_LLM_TEMPERATURE", os.getenv("TEMPERATURE", "0.2")))
 
     @property
     def max_output_tokens(self) -> int:
         """Nombre maximum de tokens en sortie."""
-        return self._config["max_output_tokens"]
+        return int(os.getenv("VAR_LLM_MAX_OUTPUT_TOKEN", "4096"))
+
+    # Token pricing (USD per 1M tokens) - Gemini 2.5 Flash
+    INPUT_TOKEN_PRICE_PER_MILLION: float = 0.15
+    OUTPUT_TOKEN_PRICE_PER_MILLION: float = 0.60
 
     @property
     def document_types(self) -> list[str]:

@@ -166,32 +166,32 @@ dossier.valider_coherence()
 
 ### Prérequis
 
-- Python 3.11+
+- Python 3.10+
 - Accès Google Cloud avec Vertex AI activé
-- uv (gestionnaire de packages)
+- [uv](https://docs.astral.sh/uv/) (gestionnaire de packages ultra-rapide)
 
 ### Setup
 
 ```bash
 # Cloner le projet
+git clone <repo-url>
 cd demonstrateur_KYC_grosse_conf
 
-# Créer l'environnement virtuel
-uv venv
-source .venv/bin/activate  # Linux/Mac
-# ou
-.venv\Scripts\activate  # Windows
-
-# Installer les dépendances
-uv pip install -e .
+# Installer les dépendances (uv crée automatiquement le .venv)
+uv sync
 
 # Configuration Google Cloud
 cp .env.example .env
 # Éditer .env avec vos credentials
 
 # Exporter les credentials
-export GOOGLE_APPLICATION_CREDENTIALS="path/to/your/credentials.json"
+export GOOGLE_APPLICATION_CREDENTIALS="path/to/your/credentials.json"  # Linux/Mac
+# ou
+$env:GOOGLE_APPLICATION_CREDENTIALS="path\to\your\credentials.json"  # Windows PowerShell
 ```
+
+> **Note**: Avec uv, pas besoin d'activer manuellement l'environnement virtuel.
+> Utilisez `uv run` pour exécuter les commandes (voir ci-dessous).
 
 ### Configuration
 
@@ -211,13 +211,13 @@ export GOOGLE_APPLICATION_CREDENTIALS="path/to/your/credentials.json"
 ### Document unique
 
 ```bash
-python src/main.py examples/cni_exemple.jpg
+uv run python src/main.py examples/cni_exemple.jpg
 ```
 
 ### Dossier complet
 
 ```bash
-python src/main.py --folder examples/dossier_client_001/
+uv run python src/main.py --folder examples/dossier_client_001/
 ```
 
 ### En code Python
@@ -238,7 +238,11 @@ dossier = pipeline.process_folder("dossier_client/")
 ## 🧪 Tests
 
 ```bash
-pytest tests/ -v
+# Exécuter les tests
+uv run pytest tests/ -v
+
+# Avec coverage
+uv run pytest tests/ --cov=src --cov-report=html
 ```
 
 ## 📊 Métriques de comparaison

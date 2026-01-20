@@ -3,7 +3,8 @@
 from datetime import date, timedelta
 
 import pytest
-from src.chains.schemas import (
+
+from chains.schemas import (
     RIB,
     CarteIdentite,
     DossierKYC,

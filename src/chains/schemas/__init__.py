@@ -1,6 +1,6 @@
 """__init__.py pour le module schemas."""
 
-from .kyc_schemas import (
+from chains.schemas.kyc_schemas import (
     RIB,
     CarteIdentite,
     ClassificationDocument,
@@ -9,17 +9,21 @@ from .kyc_schemas import (
     Passeport,
     PermisConduire,
     ResultatExtractionKYC,
+    Sexe,
     TypeDocument,
+    TypeJustificatifDomicile,
 )
 
 __all__ = [
     "CarteIdentite",
+    "ClassificationDocument",
+    "DossierKYC",
+    "JustificatifDomicile",
     "Passeport",
     "PermisConduire",
-    "JustificatifDomicile",
-    "RIB",
-    "TypeDocument",
-    "ClassificationDocument",
     "ResultatExtractionKYC",
-    "DossierKYC",
+    "RIB",
+    "Sexe",
+    "TypeDocument",
+    "TypeJustificatifDomicile",
 ]

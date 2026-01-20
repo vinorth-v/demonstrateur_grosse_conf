@@ -6,9 +6,9 @@ Traite plusieurs documents d'un même client et valide la cohérence.
 
 from pathlib import Path
 
-from .chains.configuration import Configuration
-from .chains.llm_chain import KYCDocumentChain
-from .chains.schemas import (
+from chains.configuration import Configuration
+from chains.llm_chain import KYCDocumentChain
+from chains.schemas import (
     DossierKYC,
     TypeDocument,
 )
@@ -88,9 +88,7 @@ class KYCPipeline:
 
         # Justificatif de domicile
         if TypeDocument.JUSTIFICATIF_DOMICILE in results:
-            justificatif = results[
-                TypeDocument.JUSTIFICATIF_DOMICILE
-            ].justificatif_domicile
+            justificatif = results[TypeDocument.JUSTIFICATIF_DOMICILE].justificatif_domicile
             print("✓ Justificatif de domicile trouvé")
         else:
             print("✗ Justificatif de domicile manquant")
@@ -175,10 +173,7 @@ class KYCPipeline:
 
         print("2️⃣ Justificatif de domicile...")
         result_address = self.chain.process_document(address_path)
-        if (
-            not result_address.extraction_reussie
-            or not result_address.justificatif_domicile
-        ):
+        if not result_address.extraction_reussie or not result_address.justificatif_domicile:
             raise ValueError(f"Échec extraction justificatif: {result_address.erreurs}")
         justificatif = result_address.justificatif_domicile
 

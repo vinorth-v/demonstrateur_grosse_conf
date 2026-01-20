@@ -3,7 +3,7 @@
 ## Timing: 15 minutes
 
 ### Slide 1: Titre (30 sec)
-**"RAD/LAD Multi-classes avec LLM: De 6 mois à 2 jours"**
+**"De 6 mois à 2 jours : La révolution LLM pour le traitement documentaire"**
 
 ### Slide 2: Le problème (2 min)
 - Exemple concret: documents KYC bancaires
