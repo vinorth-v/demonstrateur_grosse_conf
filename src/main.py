@@ -86,8 +86,9 @@ def demo_document_unique(image_path: str):
             print("   ⭐ L'IBAN a été validé avec l'algorithme modulo 97!")
     else:
         print("\n❌ ÉCHEC DE L'EXTRACTION\n")
-        if result.erreur:
-            print(f"   - {result.erreur}")
+        if result.erreurs:
+            for erreur in result.erreurs:
+                print(f"   - {erreur}")
 
 
 def demo_dossier_complet(folder_path: str):
