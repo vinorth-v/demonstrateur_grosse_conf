@@ -52,9 +52,33 @@ def demo_document_unique(image_path: str):
 
         elif result.passeport:
             pp = result.passeport
-            print(f"📕 Passeport de {pp.prenom} {pp.nom}")
+            # Civilité
+            if pp.sexe:
+                civilite = "M." if pp.sexe.value == "M" else ("Mme" if pp.sexe.value == "F" else "X")
+                ne_text = "Né" if pp.sexe.value == "M" else ("Née" if pp.sexe.value == "F" else "Né(e)")
+                print(f"📕 Passeport de {civilite} {pp.prenom} {pp.nom} ({pp.sexe.value})")
+            else:
+                ne_text = "Né(e)"
+                print(f"📕 Passeport de {pp.prenom} {pp.nom}")
+            # Date et lieu de naissance
+            print(f"   {ne_text} le: {pp.date_naissance} à {pp.lieu_naissance if pp.lieu_naissance else '?'}")
+            # Nationalité
+            print(f"   Nationalité: {pp.nationalite}")
+            # Statut marital
+            if getattr(pp, 'statut_marital', None):
+                print(f"   Statut marital: {pp.statut_marital}")
+            # Adresse (si présente)
+            if getattr(pp, 'adresse', None):
+                print(f"   Adresse: {pp.adresse}")
+            # Numéro, dates, autorité
             print(f"   N° passeport: {pp.numero_passeport}")
+            # print(f"   Délivré le: {pp.date_emission}")
+            # if getattr(pp, 'lieu_delivrance', None):
+            #     print(f"   Lieu de délivrance: {pp.lieu_delivrance}")
+            # if getattr(pp, 'autorite_emission', None):
+            #     print(f"   Autorité: {pp.autorite_emission}")
             print(f"   Valide jusqu'au: {pp.date_expiration}")
+            print(f"   Statut: {'✓ Valide' if pp.est_valide else '✗ Expiré'}")
 
         elif result.permis_conduire:
             pc = result.permis_conduire
@@ -68,11 +92,15 @@ def demo_document_unique(image_path: str):
         elif result.justificatif_domicile:
             jd = result.justificatif_domicile
             print("🏠 Justificatif de Domicile")
-            print(f"   Titulaire: {jd.nom_titulaire}")
+            print(f"   Type: {jd.type_document.value}")
+            print(f"   Titulaire: {jd.nom_complet}")
             print(f"   Adresse: {jd.adresse_ligne1}")
+            if jd.adresse_ligne2:
+                print(f"            {jd.adresse_ligne2}")
             print(f"            {jd.code_postal} {jd.ville}")
             print(f"   Date: {jd.date_document}")
-            print(f"   Émetteur: {jd.emetteur}")
+            if jd.emetteur:
+                print(f"   Émetteur: {jd.emetteur}")
             print(f"   Statut: {'✓ Récent (< 3 mois)' if jd.est_recent else '✗ Trop ancien'}")
 
         elif result.rib:
@@ -89,6 +117,17 @@ def demo_document_unique(image_path: str):
         if result.erreurs:
             for erreur in result.erreurs:
                 print(f"   - {erreur}")
+
+    # # Afficher le résultat en JSON structuré
+    # print("\n" + "=" * 70)
+    # print("📋 RÉSULTAT JSON STRUCTURÉ")
+    # print("=" * 70 + "\n")
+
+    # # Convertir le résultat Pydantic en dictionnaire avec dates ISO
+    # result_dict = result.model_dump(mode='json', exclude_none=True)
+
+    # # Afficher le JSON formaté avec indentation
+    # print(json.dumps(result_dict, indent=2, ensure_ascii=False))
 
 
 def demo_dossier_complet(folder_path: str):

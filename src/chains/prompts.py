@@ -66,31 +66,34 @@ Si une information est absente, indique null (sauf pour les champs obligatoires)
 
 PROMPT_EXTRACTION_PASSEPORT = """Tu es un système d'extraction de données de passeport français.
 
-Extrais TOUTES les informations suivantes:
+Extrais TOUTES les informations suivantes du document fourni :
 
-INFORMATIONS OBLIGATOIRES:
-- numero_passeport: Numéro du passeport (format: 2 chiffres + 7 lettres, ex: 24AX12345)
-- nom: Nom de famille
-- prenom: Prénom(s)
-- sexe: M ou F
-- date_naissance: Date au format YYYY-MM-DD
-- lieu_naissance: Lieu de naissance
-- nationalite: Code pays (FRA pour France)
-- date_emission: Date d'émission au format YYYY-MM-DD
-- date_expiration: Date d'expiration au format YYYY-MM-DD
-- autorite_delivrance: Autorité qui a délivré le passeport (ex: "Préfecture de Paris")
+INFORMATIONS OBLIGATOIRES :
+- numero_passeport : Numéro du passeport (format : 2 chiffres + 7 lettres, ex : 24AX12345)
+- nom : Nom de famille (en MAJUSCULES)
+- prenom : Prénom(s)
+- sexe : M, F ou X
+- date_naissance : Date de naissance au format YYYY-MM-DD
+- lieu_naissance : Lieu de naissance (ville et pays)
+- nationalite : Nationalité (code pays, ex : FRA)
+- date_emission : Date de délivrance au format YYYY-MM-DD
+- date_expiration : Date d'expiration au format YYYY-MM-DD
 
-INFORMATIONS OPTIONNELLES:
-- mrz_ligne1: Première ligne de la zone MRZ (en bas du passeport)
-- mrz_ligne2: Deuxième ligne de la zone MRZ
+INFORMATIONS OPTIONNELLES :
+- statut_marital : Statut marital (ex : célibataire, marié, divorcé), si présent
+- autorite_emission : Autorité émettrice du passeport (ex : "Préfecture de Paris")
+- lieu_delivrance : Lieu de délivrance du passeport, si différent de l'autorité
+- adresse : Adresse complète du titulaire, si présente
+- mrz_ligne1 : Première ligne de la zone MRZ (en bas du passeport)
+- mrz_ligne2 : Deuxième ligne de la zone MRZ
 
-POINTS D'ATTENTION:
+POINTS D'ATTENTION :
 - Le passeport français a une couverture bordeaux avec "UNION EUROPÉENNE" et "PASSEPORT"
 - La zone MRZ (Machine Readable Zone) contient des données encodées, copie-la exactement
 - Le numéro commence toujours par 2 chiffres puis 7 lettres
-- Validité: 10 ans pour adultes, 5 ans pour mineurs
+- Validité : 10 ans pour adultes, 5 ans pour mineurs
 
-Réponds UNIQUEMENT en JSON selon le schéma Passeport."""
+Réponds UNIQUEMENT en JSON structuré selon le schéma Passeport. Si une information est absente, indique null (sauf pour les champs obligatoires)."""
 
 PROMPT_EXTRACTION_PERMIS = """Tu es un système d'extraction de données de permis de conduire français (format européen).
 
@@ -136,7 +139,7 @@ PROMPT_EXTRACTION_JUSTIFICATIF = """Tu es un système d'extraction de données d
 CAS COMPLEXE: formats extrêmement variés!
 - Factures EDF, Orange, Free, Bouygues, etc.
 - Quittances de loyer
-- Taxes
+- Taxes (taxe d'habitation, taxe foncière, avis d'imposition)
 - Attestations d'assurance
 
 Chaque format est différent, mais tu dois extraire les mêmes infos.
@@ -144,18 +147,22 @@ Chaque format est différent, mais tu dois extraire les mêmes infos.
 Extrais:
 
 INFORMATIONS OBLIGATOIRES:
-- type_justificatif: Type parmi [facture_electricite, facture_gaz, facture_eau, facture_internet, facture_telephone, quittance_loyer, taxe_habitation, attestation_assurance_habitation]
-- nom_titulaire: Nom du titulaire (celui qui reçoit le document)
+- type_document: Type parmi [utility_bill, bank_statement, tax_notice, rental_agreement, residence_certificate]
+  * utility_bill: facture d'électricité, gaz, eau, internet, téléphone
+  * bank_statement: relevé bancaire
+  * tax_notice: avis d'imposition, taxe d'habitation, taxe foncière
+  * rental_agreement: quittance de loyer
+  * residence_certificate: attestation d'hébergement
+- nom_complet: Nom complet du titulaire (prénom et nom) - celui qui reçoit le document
 - adresse_ligne1: Numéro et nom de rue
 - code_postal: Code postal (5 chiffres)
 - ville: Ville
 - date_document: Date du document au format YYYY-MM-DD
-- emetteur: Société/organisme émetteur (EDF, Orange, SAUR, etc.)
 
 INFORMATIONS OPTIONNELLES:
-- prenom_titulaire: Prénom si présent
 - adresse_ligne2: Complément d'adresse (appartement, bâtiment, etc.)
-- montant: Montant facturé si c'est une facture
+- emetteur: Société/organisme émetteur (EDF, Orange, SAUR, Direction Générale des Finances Publiques, etc.)
+- pays: Pays (par défaut "France")
 
 VALIDATION IMPORTANTE:
 - Le document doit dater de MOINS DE 3 MOIS
@@ -163,9 +170,10 @@ VALIDATION IMPORTANTE:
 - Le nom doit correspondre au titulaire du dossier KYC
 
 ATTENTION:
-- Parfois le prénom n'est pas indiqué, uniquement "M. DUPONT" ou "Mme MARTIN"
+- Parfois le prénom n'est pas indiqué, uniquement "M. DUPONT" ou "Mme MARTIN" - dans ce cas mets juste le nom disponible
 - L'adresse peut être sur plusieurs lignes, structure-la proprement
 - La date peut être en haut ou en bas du document, cherche bien
+- Pour les avis d'impôts, le nom peut être en haut ou dans une section "Vos références"
 
 Réponds en JSON selon le schéma JustificatifDomicile."""
 

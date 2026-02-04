@@ -5,6 +5,7 @@ Utilise Vertex AI Gemini avec extraction structurée via Pydantic.
 """
 
 import json
+import time
 from pathlib import Path
 
 import vertexai
@@ -334,21 +335,25 @@ class KYCDocumentChain:
         }
 
         try:
-            # 1. Classification
+            # 1. Classification (RAD - Reconnaissance Automatique de Documents)
             print(f"🔍 Classification du document: {image_path}")
+            start_rad = time.time()
             classification, token_usage_classification = self.classify_document(image_path)
+            time_rad = time.time() - start_rad
             print(
                 f"   ✓ Type détecté: {classification.type_detecte.value} "
                 f"(confiance: {classification.confiance:.2%})"
             )
+            # print(f"   ⏱️  Temps RAD (Classification): {time_rad:.2f}s")
 
             # Accumuler les tokens de classification
             if token_usage_classification:
                 for key in total_tokens_usage:
                     total_tokens_usage[key] += token_usage_classification.get(key, 0)
 
-            # 2. Extraction selon le type
+            # 2. Extraction selon le type (LAD - Lecture Automatique de Documents)
             print("📄 Extraction des données...")
+            start_lad = time.time()
             extraction_result = None
             token_usage_extraction = None
 
@@ -363,12 +368,15 @@ class KYCDocumentChain:
             elif classification.type_detecte == TypeDocument.RIB:
                 extraction_result, token_usage_extraction = self.extract_rib(image_path)
 
+            time_lad = time.time() - start_lad
+
             # Accumuler les tokens d'extraction
             if token_usage_extraction:
                 for key in total_tokens_usage:
                     total_tokens_usage[key] += token_usage_extraction.get(key, 0)
 
             print("   ✓ Extraction réussie")
+            # print(f"   ⏱️  Temps LAD (Extraction): {time_lad:.2f}s")
 
             # Afficher le total des tokens et coût pour ce document
             if total_tokens_usage["total_tokens"] > 0:
@@ -377,10 +385,12 @@ class KYCDocumentChain:
                 ) * self.config.INPUT_TOKEN_PRICE_PER_MILLION + (
                     total_tokens_usage["output_tokens"] / 1_000_000
                 ) * self.config.OUTPUT_TOKEN_PRICE_PER_MILLION
+                total_time = time_rad + time_lad
                 print(
                     f"   📊 Total tokens: {total_tokens_usage['total_tokens']} | "
                     f"Coût total: ${total_cost:.6f}"
                 )
+                # print(f"   ⏱️  Temps total (RAD + LAD): {total_time:.2f}s")
 
             # 3. Construction du résultat
             result = ResultatExtractionKYC(

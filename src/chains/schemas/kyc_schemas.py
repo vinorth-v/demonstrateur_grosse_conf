@@ -220,31 +220,30 @@ class Passeport(BaseModel):
         description="Type de document : passeport",
     )
 
+
     numero_passeport: str = Field(description="Numéro du passeport")
-
     nom: str = Field(description="Nom de famille (en majuscules)")
-
     prenom: str = Field(description="Prénom(s)")
-
     date_naissance: date = Field(description="Date de naissance au format YYYY-MM-DD")
-
     lieu_naissance: Optional[str] = Field(None, description="Lieu de naissance (ville et pays)")
-
     nationalite: str = Field(description="Nationalité")
-
     sexe: Optional[Sexe] = Field(None, description="Genre : M, F, ou X")
-
+    statut_marital: Optional[str] = Field(
+        None, description="Statut marital (ex: célibataire, marié, divorcé), si présent sur le passeport"
+    )
     date_emission: date = Field(description="Date de délivrance du document au format YYYY-MM-DD")
-
     date_expiration: date = Field(description="Date d'expiration du document au format YYYY-MM-DD")
-
     autorite_emission: Optional[str] = Field(None, description="Autorité émettrice du document")
-
+    lieu_delivrance: Optional[str] = Field(
+        None, description="Lieu de délivrance du passeport, si différent de l'autorité"
+    )
+    adresse: Optional[str] = Field(
+        None, description="Adresse complète du titulaire, si présente sur le passeport"
+    )
     mrz_ligne1: Optional[str] = Field(
         None,
         description="Première ligne de la zone de lecture automatique (MRZ) si présente",
     )
-
     mrz_ligne2: Optional[str] = Field(
         None,
         description="Deuxième ligne de la zone de lecture automatique (MRZ) si présente",

@@ -82,6 +82,30 @@ class TestCarteIdentite:
 
 
 class TestPasseport:
+        def test_passeport_champs_optionnels(self):
+            """Test des champs optionnels du passeport (statut marital, adresse, lieu de délivrance)."""
+            pp = Passeport(
+                numero_passeport="24AX12345",
+                nom="MARTIN",
+                prenom="Jean",
+                sexe=Sexe.M,
+                date_naissance=date(1990, 5, 15),
+                lieu_naissance="Paris",
+                nationalite="FRA",
+                statut_marital="marié",
+                date_emission=date(2020, 1, 1),
+                date_expiration=date(2030, 1, 1),
+                autorite_emission="Préfecture de Paris",
+                lieu_delivrance="Paris",
+                adresse="10 rue de la Paix, 75001 Paris",
+                mrz_ligne1="P<FRAMARTIN<<JEAN<<<<<<<<<<<<<<<<<<<<<<<<<",
+                mrz_ligne2="24AX12345FRA9005159M3001012<<<<<<<<<<<<<<00",
+            )
+            assert pp.statut_marital == "marié"
+            assert pp.adresse == "10 rue de la Paix, 75001 Paris"
+            assert pp.lieu_delivrance == "Paris"
+            assert pp.mrz_ligne1.startswith("P<FRAMARTIN")
+            assert pp.mrz_ligne2.startswith("24AX12345FRA")
     """Tests pour le schéma Passeport."""
 
     def test_passeport_valide(self):
