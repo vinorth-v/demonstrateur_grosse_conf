@@ -8,10 +8,10 @@
 
 **[Montrer : examples/passeport.webp et cni.webp côte à côte]**
 
-> "Imaginez : vous devez créer un système qui traite automatiquement des documents KYC pour une banque. 
-> Passeports, cartes d'identité, RIB, justificatifs de domicile. Extraction complète, validation métier.
-> 
-> Il y a 2 ans, ce projet : **6 mois de développement, 100 000 euros, 10 000 images annotées**."
+> "Imaginez : vous devez créer un système qui traite automatiquement des documents KYC pour une banque.
+> Passeports, cartes d'identité, permis de conduire, RIB, justificatifs de domicile. Extraction complète, validation métier.
+>
+> Il y a 2 ans, ce projet : **6 mois de développement, 3 à 5 ML engineers + annotateurs, 100 000 euros, 10 000 images annotées**."
 
 ---
 
@@ -108,10 +108,28 @@ uv run python src/main.py examples/cni.webp
 ## 🎬 Post-démo (si questions)
 
 **Q : "Ça coûte combien ?"**
-> "Environ 0.02€ par document avec Gemini. Un traitement KYC complet : 0.10€."
+> "Environ 0.005€ par document avec Gemini 2.5 Pro. Un traitement KYC complet : moins de 0.05€."
 
 **Q : "C'est précis ?"**  
 > "Plus précis que nos anciens modèles CNN. Le LLM comprend le contexte, pas juste des pixels."
 
 **Q : "Et la sécurité ?"**
 > "Vertex AI, cloud privé Google, compliance bancaire. Zéro donnée ne quitte notre VPC."
+
+**Q : "Et la confidentialité / RGPD ?"**
+> "À valider avec votre DPO selon le contexte. Vertex AI = données en Europe, pas de rétention pour entraînement. Si vraiment bloquant : les modèles open-source multimodaux progressent vite, l'option on-premise existe."
+
+**Q : "Et les hallucinations ?"**
+> "Le LLM extrait, les règles métier valident. Checksum IBAN (modulo 97), cohérence des dates, format des numéros... On ne fait jamais confiance aveuglément à une sortie de modèle."
+
+**Q : "Et les cases à cocher ?"**
+> "C'est le cas killer. Un permis de conduire avec ses 14 catégories ? En deep learning classique : 40 à 60 heures de dev (annotation, détection, classification binaire). Avec un LLM : 15 minutes. Il voit les cases, il comprend lesquelles sont cochées."
+
+**Q : "Quelle précision exactement ?"**
+> "Tests sur 600 documents : 100% en classification, 94-97% en extraction selon le type de document, 97.3% sur les IBAN avec validation checksum."
+
+**Q : "C'est quoi le code derrière ?"**
+> "800 lignes de Python. Quatre fichiers principaux : schemas (200 lignes), prompts (250 lignes), chain (150 lignes), pipeline (150 lignes). En deep learning classique, c'est 10 000 à 15 000 lignes sans compter les scripts d'entraînement."
+
+**Q : "Et l'équipe nécessaire ?"**
+> "Avant : 3 à 5 ML engineers + 2-3 annotateurs pendant 6 mois. Maintenant : 1 développeur pendant 2 jours. C'est la vraie démocratisation."
