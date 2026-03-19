@@ -73,20 +73,10 @@ cni:
 passeport:
     PYTHONPATH=src uv run python src/main.py examples/passeport.webp
 
-# 🚗 Traite le permis recto/verso (PDF)
+# 🚗 Traite le permis recto/verso 
 [group('demo')]
 permis:
     PYTHONPATH=src uv run python src/main.py examples/permis_recto_verso.pdf
-
-# 🚗 Traite le permis recto seul
-[group('demo')]
-permis-recto:
-    PYTHONPATH=src uv run python src/main.py examples/permis_recto.jpg
-
-# 🚗 Traite le permis verso seul
-[group('demo')]
-permis-verso:
-    PYTHONPATH=src uv run python src/main.py examples/permis_verso.jpg
 
 # ⚡ Traite une facture EDF
 [group('demo')]
