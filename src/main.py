@@ -78,11 +78,6 @@ def demo_document_unique(image_path: str):
                 print(f"   Adresse: {pp.adresse}")
             # Numéro, dates, autorité
             print(f"   N° passeport: {pp.numero_passeport}")
-            # print(f"   Délivré le: {pp.date_emission}")
-            # if getattr(pp, 'lieu_delivrance', None):
-            #     print(f"   Lieu de délivrance: {pp.lieu_delivrance}")
-            # if getattr(pp, 'autorite_emission', None):
-            #     print(f"   Autorité: {pp.autorite_emission}")
             print(f"   Valide jusqu'au: {pp.date_expiration}")
             print(f"   Statut: {'✓ Valide' if pp.est_valide else '✗ Expiré'}")
 
@@ -123,17 +118,6 @@ def demo_document_unique(image_path: str):
         if result.erreurs:
             for erreur in result.erreurs:
                 print(f"   - {erreur}")
-
-    # # Afficher le résultat en JSON structuré
-    # print("\n" + "=" * 70)
-    # print("📋 RÉSULTAT JSON STRUCTURÉ")
-    # print("=" * 70 + "\n")
-
-    # # Convertir le résultat Pydantic en dictionnaire avec dates ISO
-    # result_dict = result.model_dump(mode='json', exclude_none=True)
-
-    # # Afficher le JSON formaté avec indentation
-    # print(json.dumps(result_dict, indent=2, ensure_ascii=False))
 
 
 def demo_dossier_complet(folder_path: str):
