@@ -133,11 +133,11 @@ class RIB(BaseModel):
 
     nom_titulaire: str = Field(description="Nom du titulaire du compte")
 
-    iban: str = Field(description="Numéro IBAN complet (format international)")
+    iban: Optional[str] = Field(None, description="Numéro IBAN complet (format international)")
 
     bic: Optional[str] = Field(None, description="Code BIC/SWIFT de la banque")
 
-    nom_banque: str = Field(description="Nom de la banque")
+    nom_banque: Optional[str] = Field(None, description="Nom de la banque")
 
     adresse_banque: Optional[str] = Field(None, description="Adresse de l'agence bancaire")
 
@@ -151,34 +151,34 @@ class RIB(BaseModel):
 
     @field_validator("iban")
     @classmethod
-    def clean_iban(cls, v: str) -> str:
+    def clean_iban(cls, v: Optional[str]) -> Optional[str]:
         """Nettoie l'IBAN en supprimant les espaces."""
+        if v is None:
+            return None
         return v.replace(" ", "").upper()
 
-    @field_validator("iban_valide", mode="before")
-    @classmethod
-    def validate_iban_checksum(cls, v, info):
+    @model_validator(mode="after")
+    def validate_iban_checksum(self):
         """Valide le checksum de l'IBAN."""
-        if "iban" in info.data:
-            iban = info.data["iban"].replace(" ", "")
-            # Vérifie la longueur minimale
-            if len(iban) < 15:
-                return False
+        if not self.iban:
+            self.iban_valide = False
+            return self
 
-            # Réarrange : déplace les 4 premiers caractères à la fin
-            rearranged = iban[4:] + iban[:4]
+        iban = self.iban.replace(" ", "")
+        if len(iban) < 15:
+            self.iban_valide = False
+            return self
 
-            # Convertit les lettres en chiffres (A=10, B=11, ..., Z=35)
-            numeric = ""
-            for char in rearranged:
-                if char.isdigit():
-                    numeric += char
-                else:
-                    numeric += str(ord(char) - ord("A") + 10)
+        rearranged = iban[4:] + iban[:4]
+        numeric = ""
+        for char in rearranged:
+            if char.isdigit():
+                numeric += char
+            else:
+                numeric += str(ord(char) - ord("A") + 10)
 
-            # Vérifie que le modulo 97 = 1
-            return int(numeric) % 97 == 1
-        return False
+        self.iban_valide = int(numeric) % 97 == 1
+        return self
 
 
 class DossierKYC(BaseModel):
