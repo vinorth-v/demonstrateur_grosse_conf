@@ -207,6 +207,8 @@ class KYCDocumentChain:
             self._log_token_usage("Extraction CNI", token_usage)
 
         result_json = json.loads(response.text)
+        if isinstance(result_json, list):
+            result_json = result_json[0]
         return CarteIdentite(**result_json), token_usage
 
     def extract_passeport(self, image_path: str | Path) -> tuple[Passeport, dict | None]:
@@ -232,6 +234,8 @@ class KYCDocumentChain:
             self._log_token_usage("Extraction Passeport", token_usage)
 
         result_json = json.loads(response.text)
+        if isinstance(result_json, list):
+            result_json = result_json[0]
         return Passeport(**result_json), token_usage
 
     def extract_permis(self, image_path: str | Path) -> tuple[PermisConduire, dict | None]:
@@ -259,6 +263,8 @@ class KYCDocumentChain:
             self._log_token_usage("Extraction Permis", token_usage)
 
         result_json = json.loads(response.text)
+        if isinstance(result_json, list):
+            result_json = result_json[0]
         return PermisConduire(**result_json), token_usage
 
     def extract_justificatif(
@@ -286,6 +292,8 @@ class KYCDocumentChain:
             self._log_token_usage("Extraction Justificatif", token_usage)
 
         result_json = json.loads(response.text)
+        if isinstance(result_json, list):
+            result_json = result_json[0]
         return JustificatifDomicile(**result_json), token_usage
 
     def extract_rib(self, image_path: str | Path) -> tuple[RIB, dict | None]:
@@ -313,6 +321,8 @@ class KYCDocumentChain:
             self._log_token_usage("Extraction RIB", token_usage)
 
         result_json = json.loads(response.text)
+        if isinstance(result_json, list):
+            result_json = result_json[0]
         return RIB(**result_json), token_usage
 
     def process_document(self, image_path: str | Path) -> ResultatExtractionKYC:
