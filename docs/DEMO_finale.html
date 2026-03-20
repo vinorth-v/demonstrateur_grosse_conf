@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>DEMO FINALE — KYC avec LLM Multimodal</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">DEMO FINALE — KYC avec LLM Multimodal</h1>
+</header>
+<h1 id="demo-finale-kyc-avec-llm-multimodal-5-6-min">DEMO FINALE — KYC
+avec LLM Multimodal (5-6 min)</h1>
+<hr />
+<h2 id="phase-1-la-problématique-000---045">PHASE 1 — La problématique
+(0:00 - 0:45)</h2>
+<p><strong>[Écran : rien de spécial, juste toi face au
+public]</strong></p>
+<blockquote>
+<p>“Est-ce qu’il vous est déjà arrivé de devoir classifier et extraire
+des informations de milliers, voire de millions de documents ?</p>
+<p>C’est le problème de la <strong>KYC — Know Your Customer</strong>. Le
+client nous envoie des CNI, des passeports, des justificatifs de
+domicile, des RIB… et on doit extraire les informations en temps
+réel.</p>
+<p>Il y a deux grandes étapes : - La <strong>RAD</strong> —
+Reconnaissance Automatique de Documents : c’est quoi ce document ? - La
+<strong>LAD</strong> — Lecture Automatique de Documents : qu’est-ce
+qu’il y a dedans ?</p>
+<p>Avant, pour faire ça, il fallait : 1. Collecter un dataset de
+milliers d’images 2. Les faire annoter par des annotateurs externes 3.
+Reviewer et corriger ces annotations 4. Entraîner un modèle de Computer
+Vision 5. L’évaluer, le réentraîner, encore et encore</p>
+<p>On parle de <strong>6 mois de développement, 3 à 5 ML engineers, des
+annotateurs, et facilement 100 000 euros</strong>.</p>
+<p>Ce que je vais vous montrer aujourd’hui, c’est que tout ça peut être
+remplacé par un <strong>prompt</strong> et un <strong>schéma de
+données</strong>.”</p>
+</blockquote>
+<hr />
+<h2 id="phase-2-le-prompt-cest-le-nouveau-modèle-045---145">PHASE 2 — Le
+prompt, c’est le nouveau modèle (0:45 - 1:45)</h2>
+<p><strong>[Écran : ouvrir <code>src/chains/prompts.py</code> —
+PROMPT_CLASSIFICATION en plein écran]</strong></p>
+<blockquote>
+<p>“Voici le prompt de classification — la RAD. Regardez : on décrit
+simplement au LLM les types de documents qu’on attend, et on lui demande
+de nous dire lequel c’est, avec un score de confiance.</p>
+<p><strong>Trente lignes de texte.</strong> C’est tout. Pas de CNN, pas
+de dataset, pas d’entraînement.</p>
+<p>Le LLM est multimodal : il <strong>voit</strong> l’image et il
+<strong>comprend</strong> ce qu’il voit.”</p>
+</blockquote>
+<p><strong>[Scroller vers PROMPT_EXTRACTION_PASSEPORT]</strong></p>
+<blockquote>
+<p>“Et voici le prompt d’extraction — la LAD. Là, on lui dit : ‘Voici un
+passeport, extrais-moi le nom, le prénom, la date de naissance, le
+numéro, la MRZ…’</p>
+<p>On guide le modèle avec des instructions précises : le format des
+dates, comment lire la zone MRZ, quels champs sont obligatoires.</p>
+<p>C’est du <strong>prompt engineering</strong> — et c’est ça qui
+remplace des mois d’annotation et d’entraînement.”</p>
+</blockquote>
+<hr />
+<h2 id="phase-3-le-structured-output-la-clé-de-voûte-145---300">PHASE 3
+— Le structured output, la clé de voûte (1:45 - 3:00)</h2>
+<p><strong>[Écran : ouvrir
+<code>src/chains/schemas/kyc_schemas.py</code> — classe Passeport en
+plein écran]</strong></p>
+<blockquote>
+<p>“Mais la question que vous allez me poser, c’est : comment on
+<strong>structure</strong> tout ça correctement ? Comment on évite que
+le LLM nous renvoie n’importe quoi ?</p>
+<p>La réponse, c’est le <strong>structured output</strong> avec
+<strong>Pydantic</strong>.</p>
+<p>Regardez ce schéma. C’est une classe Python qui décrit exactement ce
+qu’on attend en sortie : chaque champ a un <strong>type</strong> —
+<code>str</code>, <code>date</code>, <code>Optional</code> — et une
+<strong>description</strong> qui aide le LLM à comprendre ce qu’on
+veut.</p>
+<p>Par exemple ici, <code>numero_document</code> c’est un
+<code>str</code> avec la description ‘Numéro du passeport’. Le LLM sait
+exactement quoi mettre dedans.</p>
+<p>Et surtout, Pydantic <strong>valide</strong> la sortie. Si le LLM
+renvoie une date dans le mauvais format, ça casse. Si un champ
+obligatoire manque, ça casse. On ne fait <strong>jamais confiance
+aveuglément</strong> à une sortie de modèle.”</p>
+</blockquote>
+<p><strong>[Scroller vers la classe RIB — montrer le validateur
+IBAN]</strong></p>
+<blockquote>
+<p>“Mieux encore : on peut ajouter des <strong>règles métier</strong>
+directement dans le schéma. Ici sur le RIB, on a un validateur qui
+vérifie le <strong>checksum IBAN</strong> — l’algorithme modulo 97. Si
+l’IBAN extrait ne passe pas cette validation mathématique, on le sait
+immédiatement.</p>
+<p>C’est comme ça qu’on gère les hallucinations : le <strong>LLM
+extrait</strong>, les <strong>règles métier valident</strong>.”</p>
+</blockquote>
+<p><strong>[Montrer rapidement la classe JustificatifDomicile — le
+validateur de récence]</strong></p>
+<blockquote>
+<p>“Autre exemple : le justificatif de domicile. On vérifie
+automatiquement qu’il date de <strong>moins de 3 mois</strong> — c’est
+une exigence réglementaire.”</p>
+</blockquote>
+<hr />
+<h2 id="phase-4-la-démo-live-300---430">PHASE 4 — La démo live (3:00 -
+4:30)</h2>
+<p><strong>[Écran : afficher <code>examples/passeport.webp</code> en
+plein écran]</strong></p>
+<blockquote>
+<p>“Passons à la pratique. Voici un passeport de test — évidemment ce
+sont des données fictives, pas de vrais documents clients.</p>
+<p>Regardez cette image : même pour un humain, lire la zone MRZ en bas,
+ces deux lignes de caractères, c’est fastidieux.”</p>
+</blockquote>
+<p><strong>[Écran : basculer sur le terminal, lancer
+<code>just passeport</code>]</strong></p>
+<blockquote>
+<p>“Je lance le traitement.”</p>
+</blockquote>
+<p><strong>[Pendant que ça tourne (~3-4 sec)]</strong></p>
+<blockquote>
+<p>“Derrière, le LLM reçoit l’image, la classifie — c’est la RAD — puis
+extrait les données — c’est la LAD — et enfin Pydantic valide le
+tout.”</p>
+</blockquote>
+<p><strong>[Résultat affiché]</strong></p>
+<blockquote>
+<p>“Voilà. <strong>Classification</strong> : passeport, avec un score de
+confiance. Puis toutes les données extraites : nom, prénom, date de
+naissance, numéro, dates d’émission et d’expiration, la MRZ complète…
+Tout structuré, tout validé.</p>
+<p>Et vous voyez le coût en bas : quelques fractions de centimes par
+document.”</p>
+</blockquote>
+<p><strong>[Écran : basculer sur le deuxième terminal avec le résultat
+CNI pré-lancé]</strong></p>
+<blockquote>
+<p>“Et voilà la même chose pour une carte d’identité. Différent format,
+différentes données, mais <strong>aucun changement de code, aucun
+réentraînement</strong>. Le LLM s’adapte.”</p>
+</blockquote>
+<hr />
+<h2 id="phase-5-limpact-et-les-résultats-430---515">PHASE 5 — L’impact
+et les résultats (4:30 - 5:15)</h2>
+<blockquote>
+<p>“Récapitulons ce qu’on vient de voir :</p>
+<ul>
+<li><strong>5 types de documents</strong> supportés : CNI, passeport,
+permis de conduire, justificatif de domicile, RIB</li>
+<li><strong>800 lignes de Python</strong> au total. En deep learning
+classique, c’est 10 000 à 15 000 lignes sans compter les scripts
+d’entraînement</li>
+<li><strong>Développement total : 2 jours.</strong> Contre 6 mois
+avant.</li>
+</ul>
+<p>Et en termes de performance : sur un autre projet client avec des
+documents fiscaux, sur <strong>6 000 documents validés</strong>,
+j’obtiens <strong>100% de précision sur la classification</strong> et
+<strong>98.7% sur l’extraction</strong> — et ça inclut des cases à
+cocher.</p>
+<p>D’ailleurs les cases à cocher, c’est le cas qui tue. Un permis de
+conduire avec ses 14 catégories ? En deep learning classique : 40 à 60
+heures de développement — annotation, détection, classification binaire.
+Avec un LLM multimodal : <strong>15 minutes</strong>. Il voit les cases,
+il comprend lesquelles sont cochées.”</p>
+</blockquote>
+<hr />
+<h2 id="phase-6-le-message-à-retenir-515---545">PHASE 6 — Le message à
+retenir (5:15 - 5:45)</h2>
+<blockquote>
+<p>“Un dernier point important : comme ce sont des données
+confidentielles, il convient de faire tourner ça dans un
+<strong>environnement sécurisé</strong>. Ici on utilise Vertex AI en
+Europe, mais on peut aussi héberger son propre LLM si nécessaire.
+L’architecture est découplée du provider.</p>
+<p>Ce que je veux que vous reteniez, c’est que pour faire de la RAD/LAD
+aujourd’hui, vous avez besoin de <strong>trois choses</strong> : 1. Un
+<strong>prompt</strong> bien écrit qui guide le modèle 2. Un
+<strong>schéma Pydantic</strong> qui structure et valide la sortie 3.
+Des <strong>règles métier</strong> qui contrôlent les hallucinations</p>
+<p>C’est ça le changement de paradigme. On passe de mois d’entraînement
+à des jours de développement.</p>
+<p>Est-ce que vous voulez que je teste un autre type de document, ou on
+passe aux questions ?”</p>
+</blockquote>
+<hr />
+<h2 id="préparation-avant-la-démo">Préparation avant la démo</h2>
+<h3 id="commandes-à-préparer">Commandes à préparer</h3>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Terminal 1 — prêt à lancer en live</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">just</span> passeport</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Terminal 2 — pré-lancer AVANT la démo (résultat déjà affiché)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">just</span> cni</span></code></pre></div>
+<h3
+id="fichiers-à-avoir-ouverts-dans-vs-code-dans-cet-ordre-donglets">Fichiers
+à avoir ouverts dans VS Code (dans cet ordre d’onglets)</h3>
+<ol type="1">
+<li><code>src/chains/prompts.py</code> — scrollé sur
+PROMPT_CLASSIFICATION</li>
+<li><code>src/chains/schemas/kyc_schemas.py</code> — scrollé sur la
+classe Passeport</li>
+<li><code>examples/passeport.webp</code> (preview)</li>
+<li>Terminal 1 prêt</li>
+<li>Terminal 2 avec résultat CNI</li>
+</ol>
+<h3 id="backup-plan">Backup plan</h3>
+<ul>
+<li>Si le terminal plante ou la latence est trop longue : “Pendant que
+ça tourne, laissez-moi vous montrer le code…” → basculer sur les
+schemas</li>
+<li>Si Vertex AI est down : avoir des <strong>screenshots des
+résultats</strong> prêts dans un dossier <code>backup/</code></li>
+<li>Avoir le résultat CNI pré-lancé = filet de sécurité</li>
+</ul>
+<h3 id="tips-de-présentation">Tips de présentation</h3>
+<ul>
+<li><strong>Rythme</strong> : ni trop rapide ni trop lent. Tu as 5-6
+min, profites-en pour laisser les gens absorber</li>
+<li><strong>Public mixte</strong> : quand tu montres du code, explique
+ce que ça fait en termes simples. “Ce champ dit au modèle ce qu’on
+attend” plutôt que “c’est un Field avec une description Pydantic”</li>
+<li><strong>Impact</strong> : insiste sur les chiffres avant/après (6
+mois → 2 jours, 100k€ → quelques euros)</li>
+<li><strong>Transition naturelle</strong> : chaque phase amène la
+suivante. Problème → solution (prompt) → comment structurer (Pydantic) →
+preuve (live) → résultats → message clé</li>
+</ul>
+<hr />
+<h2 id="faq-réponses-aux-questions">FAQ — Réponses aux questions</h2>
+<h3 id="questions-critiques">Questions critiques</h3>
+<h4
+id="comment-vous-gérez-le-rgpd-la-confidentialité-des-données">“Comment
+vous gérez le RGPD / la confidentialité des données ?”</h4>
+<blockquote>
+<p>“C’est LA bonne question dans le bancaire. On a traité ça à trois
+niveaux :</p>
+<p><strong>Infrastructure</strong> : Vertex AI en Europe (Frankfurt).
+Les données ne quittent jamais l’UE. Certifié ISO 27001, SOC 2.</p>
+<p><strong>Contractuel</strong> : Google signe un DPA — Data Processing
+Agreement — qui garantit qu’aucune donnée client n’entraîne leurs
+modèles. Zéro rétention après traitement.</p>
+<p><strong>Métier</strong> : Chez nous, la DPO a validé avant le pilote.
+Le DPIA a été positif notamment parce qu’on remplace un process manuel
+où des humains voient exactement les mêmes données.</p>
+<p>Et chaque appel API est loggé et auditable.”</p>
+</blockquote>
+<h4 id="et-si-demain-google-change-son-pricing-ou-ses-conditions">“Et si
+demain Google change son pricing ou ses conditions ?”</h4>
+<blockquote>
+<p>“On a trois parades :</p>
+<p><strong>Architecture découplée</strong> : notre code n’est pas lié à
+Vertex AI. On peut basculer sur Claude, GPT-4V ou Mistral en changeant
+une vingtaine de lignes.</p>
+<p><strong>Exit strategy</strong> : les modèles open-source multimodaux
+progressent vite. En quelques mois, le self-hosted devient viable si
+nécessaire.</p>
+<p><strong>Pricing actuel</strong> : à 0.005€ par document, même si ça
+double, on reste 100 fois moins cher que l’ancien process.”</p>
+</blockquote>
+<h4 id="cest-en-production-ou-cest-un-poc">“C’est en production ou c’est
+un POC ?”</h4>
+<blockquote>
+<p>“Le démonstrateur que je vous montre ici est un POC qui illustre
+l’approche. Sur un autre périmètre, on a validé l’approche sur 6 000
+documents réels avec les résultats que j’ai mentionnés. L’objectif est
+d’industrialiser ça avec les bonnes briques de sécurité et de
+monitoring.”</p>
+</blockquote>
+<h3 id="questions-probables">Questions probables</h3>
+<h4 id="comment-vous-gérez-les-hallucinations">“Comment vous gérez les
+hallucinations ?”</h4>
+<blockquote>
+<p>“Le LLM extrait, les règles métier valident. Exemple concret : sur un
+IBAN, on vérifie le checksum modulo 97. Si ça ne passe pas, rejet
+automatique et revue humaine.</p>
+<p>On ne fait jamais confiance aveuglément à une sortie de modèle. C’est
+tout l’intérêt du structured output avec Pydantic : on a un filet de
+sécurité typé et validé.”</p>
+</blockquote>
+<h4 id="et-pour-les-documents-de-mauvaise-qualité-ou-manuscrits">“Et
+pour les documents de mauvaise qualité ou manuscrits ?”</h4>
+<blockquote>
+<p>“Le LLM est plus robuste que les anciens OCR sur les documents
+dégradés. Il utilise le contexte global pour interpréter les caractères
+ambigus — là où un OCR classique travaille caractère par caractère.</p>
+<p>Mais on a un seuil de confiance. En dessous de 85%, on route vers une
+revue humaine. Environ 5% des documents. L’humain reste dans la
+boucle.”</p>
+</blockquote>
+<h4 id="pourquoi-pas-un-modèle-open-source-on-premise">“Pourquoi pas un
+modèle open-source on-premise ?”</h4>
+<blockquote>
+<p>“C’est l’option la plus sécurisée, mais aujourd’hui les modèles
+open-source multimodaux ont encore 6 à 12 mois de retard sur les APIs
+propriétaires en compréhension visuelle. Pour du KYC bancaire, on ne
+peut pas se permettre 5-10% de précision en moins.</p>
+<p>Et le self-hosting, c’est des GPU A100/H100, une équipe infra,
+50k€/an minimum. Avec l’API, on est à 2k€/an pour notre volume.</p>
+<p>Mais l’architecture est prête à basculer le jour où les modèles
+open-source rattrapent.”</p>
+</blockquote>
+<h4 id="ça-coûte-combien">“Ça coûte combien ?”</h4>
+<blockquote>
+<p>“Environ 0.005€ par document avec Gemini. Un dossier KYC complet —
+identité + justificatif + RIB — c’est moins de 5 centimes.”</p>
+</blockquote>
+<h4 id="temps-de-traitement-réel">“Temps de traitement réel ?”</h4>
+<blockquote>
+<p>“2 à 4 secondes par document. Pour un dossier KYC complet, on est à
+environ 10 secondes end-to-end. L’ancien process avec traitement humain
+: 48 heures minimum.”</p>
+</blockquote>
+<h4 id="cest-quoi-léquipe-nécessaire">“C’est quoi l’équipe nécessaire
+?”</h4>
+<blockquote>
+<p>“Avant : 3 à 5 ML engineers + 2-3 annotateurs pendant 6 mois.
+Maintenant : 1 développeur pendant 2 jours. C’est la vraie
+démocratisation de l’IA.”</p>
+</blockquote>
+<h3 id="questions-bonus-auxquelles-penser">Questions bonus auxquelles
+penser</h3>
+<h4 id="comment-vous-mesurez-la-qualité-en-production">“Comment vous
+mesurez la qualité en production ?”</h4>
+<blockquote>
+<p>“Trois KPIs : taux d’extraction réussie (cible 95%), taux de rejet
+automatique (cible &lt; 5%), taux d’erreur détecté en revue humaine
+(cible &lt; 1%). On échantillonne 2% des documents pour audit manuel
+hebdomadaire.”</p>
+</blockquote>
+<h4 id="et-lexplicabilité-pour-les-auditeurs">“Et l’explicabilité pour
+les auditeurs ?”</h4>
+<blockquote>
+<p>“Le prompt est versionné dans Git. Les règles métier sont explicites
+dans le code. Un auditeur peut relire le prompt et comprendre exactement
+ce qu’on demande au modèle. C’est plus explicable qu’un CNN à 10
+millions de paramètres.”</p>
+</blockquote>
+<h4 id="comment-vous-gérez-lévolution-des-formats-de-documents">“Comment
+vous gérez l’évolution des formats de documents ?”</h4>
+<blockquote>
+<p>“C’est un des gros avantages de l’approche LLM. Si le format d’une
+CNI change, avec du deep learning classique il faut réannoter et
+réentraîner. Avec un LLM, il suffit d’adapter le prompt ou le schéma.
+Pas de nouveau dataset, pas de réentraînement.”</p>
+</blockquote>
+<h4
+id="est-ce-que-ça-marche-pour-des-documents-dans-dautres-langues">“Est-ce
+que ça marche pour des documents dans d’autres langues ?”</h4>
+<blockquote>
+<p>“Les LLMs multimodaux sont nativement multilingues. On peut traiter
+des documents en anglais, espagnol, arabe… Il suffit d’adapter le
+prompt. On a testé sur des passeports étrangers sans aucun changement de
+code.”</p>
+</blockquote>
+<h4 id="et-si-le-modèle-se-trompe-de-classification">“Et si le modèle se
+trompe de classification ?”</h4>
+<blockquote>
+<p>“C’est pour ça qu’on a le score de confiance. En dessous d’un certain
+seuil, on peut demander une double vérification — soit un deuxième appel
+au LLM avec un prompt différent, soit un routage vers un humain. En
+pratique, sur nos tests, la classification est à 100%.”</p>
+</blockquote>
+<h4 id="comment-vous-gérez-la-montée-en-charge">“Comment vous gérez la
+montée en charge ?”</h4>
+<blockquote>
+<p>“L’API Vertex AI scale automatiquement. On peut paralléliser les
+appels : 10, 50, 100 documents en simultané. C’est l’avantage d’une
+architecture cloud-native. Pas de GPU à provisionner, pas de queue à
+gérer.”</p>
+</blockquote>
+</body>
+</html>
