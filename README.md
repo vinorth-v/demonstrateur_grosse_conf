@@ -7,52 +7,52 @@ Traitement automatique de documents KYC (Know Your Customer) avec des LLM multim
 
 ## Pourquoi ce projet ?
 
-### Le probleme avec le deep learning classique
+### Le problème avec le deep learning classique
 
-Pour creer un systeme de classification et extraction de documents KYC avec deep learning classique:
+Pour créer un système de classification et extraction de documents KYC avec deep learning classique :
 
-- **Plusieurs mois de developpement**: collecte de donnees, annotation, entrainement de modeles CNN, post-processing OCR
-- **Couts eleves**: infrastructure GPU, equipe ML, data labelers
-- **Resultats limites**: ne fonctionne que sur les formats appris, necessite re-entrainement pour chaque variation
+- **Plusieurs mois de développement** : collecte de données, annotation, entraînement de modèles CNN, post-processing OCR
+- **Coûts élevés** : infrastructure GPU, équipe ML, data labelers
+- **Résultats limités** : ne fonctionne que sur les formats appris, nécessite ré-entraînement pour chaque variation
 
 ### La solution avec les LLM multimodaux
 
-- **Quelques heures de developpement**: prompts + schemas Pydantic + regles metier
-- **Couts minimes**: API calls, zero infrastructure d'entrainement
-- **Resultats superieurs**: fonctionne out-of-the-box sur nouveaux formats, robuste aux variations
+- **Quelques heures de développement** : prompts + schémas Pydantic + règles métier
+- **Coûts minimes** : API calls, zéro infrastructure d'entraînement
+- **Résultats supérieurs** : fonctionne out-of-the-box sur nouveaux formats, robuste aux variations
 
-## Fonctionnalites
+## Fonctionnalités
 
-### Documents traites
+### Documents traités
 
-1. **Pieces d'identite**
-   - Carte Nationale d'Identite (CNI)
+1. **Pièces d'identité**
+   - Carte Nationale d'Identité (CNI)
    - Passeport
-   - Permis de conduire (avec detection des categories cochees)
+   - Permis de conduire (avec détection des catégories cochées)
 
 2. **Justificatifs de domicile**
-   - Factures (electricite, gaz, eau, internet, telephone)
+   - Factures (électricité, gaz, eau, internet, téléphone)
    - Quittances de loyer
    - Taxes
    - Attestations d'assurance
 
-3. **Coordonnees bancaires**
+3. **Coordonnées bancaires**
    - RIB/IBAN avec validation checksum modulo 97
 
-### Regles metier
+### Règles métier
 
-- Validation de coherence entre documents (nom, prenom)
-- Verification des dates d'expiration
-- Controle de l'anciennete (justificatif < 3 mois)
+- Validation de cohérence entre documents (nom, prénom)
+- Vérification des dates d'expiration
+- Contrôle de l'ancienneté (justificatif < 3 mois)
 - Validation technique IBAN (checksum)
-- Detection visuelle des cases cochees (permis de conduire)
+- Détection visuelle des cases cochées (permis de conduire)
 
 ## Installation
 
-### Prerequis
+### Prérequis
 
 - Python 3.10+
-- Acces Google Cloud avec Vertex AI active
+- Accès Google Cloud avec Vertex AI activé
 - [uv](https://docs.astral.sh/uv/) (gestionnaire de packages)
 - [just](https://github.com/casey/just) (task runner, optionnel)
 
@@ -63,12 +63,12 @@ Pour creer un systeme de classification et extraction de documents KYC avec deep
 git clone https://github.com/votre-username/kyc-document-processing.git
 cd kyc-document-processing
 
-# Installer les dependances
+# Installer les dépendances
 uv sync
 
 # Configuration
 cp .env.example .env
-# Editer .env avec vos credentials
+# Éditer .env avec vos credentials
 
 # Exporter les credentials Google Cloud
 export GOOGLE_APPLICATION_CREDENTIALS="path/to/your/credentials.json"
@@ -118,14 +118,14 @@ kyc-document-processing/
 ├── src/
 │   ├── chains/
 │   │   ├── schemas/
-│   │   │   └── kyc_schemas.py      # Schemas Pydantic pour chaque doc
+│   │   │   └── kyc_schemas.py      # Schémas Pydantic pour chaque doc
 │   │   ├── configuration.py         # Config Google Cloud / Vertex AI
 │   │   ├── llm_chain.py            # Chain LLM principale
 │   │   └── prompts.py              # Prompts pour classification/extraction
 │   ├── utils/
 │   │   └── config.py               # Utilitaires de configuration
 │   ├── pipeline.py                 # Pipeline multi-documents
-│   └── main.py                     # Point d'entree
+│   └── main.py                     # Point d'entrée
 ├── tests/
 │   └── test_schemas.py             # Tests unitaires
 └── config/
@@ -142,7 +142,7 @@ result = chain.classify_document("document.jpg")
 # -> "carte_identite" avec 98% de confiance
 ```
 
-### Extraction structuree
+### Extraction structurée
 
 ```python
 cni = chain.extract_cni("cni.jpg")
@@ -150,7 +150,7 @@ print(f"{cni.prenom} {cni.nom}")
 print(f"Valide: {cni.est_valide}")
 ```
 
-### Detection des cases cochees (permis)
+### Détection des cases cochées (permis)
 
 ```python
 permis = chain.extract_permis("permis.jpg")
@@ -174,11 +174,11 @@ uv run pytest tests/ -v
 
 ## Contribuer
 
-Les contributions sont les bienvenues ! Consultez [CONTRIBUTING.md](CONTRIBUTING.md) pour les details.
+Les contributions sont les bienvenues ! Consultez [CONTRIBUTING.md](CONTRIBUTING.md) pour les détails.
 
 ## Licence
 
-Ce projet est sous licence MIT. Voir [LICENSE](LICENSE) pour plus de details.
+Ce projet est sous licence MIT. Voir [LICENSE](LICENSE) pour plus de détails.
 
 ## Ressources
 

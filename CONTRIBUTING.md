@@ -1,24 +1,24 @@
 # Contribuer au projet
 
-Merci de votre interet pour ce projet ! Voici comment contribuer.
+Merci de votre intérêt pour ce projet ! Voici comment contribuer.
 
 ## Signaler un bug
 
-1. Verifiez que le bug n'a pas deja ete signale dans les [Issues](../../issues)
-2. Creez une nouvelle issue avec:
-   - Description claire du probleme
-   - Etapes pour reproduire
-   - Comportement attendu vs observe
-   - Version de Python et des dependances
+1. Vérifiez que le bug n'a pas déjà été signalé dans les [Issues](../../issues)
+2. Créez une nouvelle issue avec :
+   - Description claire du problème
+   - Étapes pour reproduire
+   - Comportement attendu vs observé
+   - Version de Python et des dépendances
 
-## Proposer une amelioration
+## Proposer une amélioration
 
-1. Ouvrez une issue pour discuter de votre idee
-2. Attendez la validation avant de commencer le developpement
+1. Ouvrez une issue pour discuter de votre idée
+2. Attendez la validation avant de commencer le développement
 
 ## Soumettre du code
 
-### Prerequis
+### Prérequis
 
 - Python 3.10+
 - [uv](https://docs.astral.sh/uv/) (gestionnaire de packages)
@@ -31,52 +31,52 @@ Merci de votre interet pour ce projet ! Voici comment contribuer.
 git clone https://github.com/VOTRE_USERNAME/kyc-document-processing.git
 cd kyc-document-processing
 
-# Installer les dependances
+# Installer les dépendances
 uv sync
 
-# Verifier que tout fonctionne
+# Vérifier que tout fonctionne
 just check
 ```
 
 ### Workflow
 
-1. Creez une branche depuis `main`:
+1. Créez une branche depuis `main` :
    ```bash
    git checkout -b feature/ma-fonctionnalite
    ```
 
 2. Faites vos modifications en suivant les conventions de code
 
-3. Verifiez votre code:
+3. Vérifiez votre code :
    ```bash
    just check  # Formate, lint et tests
    ```
 
-4. Committez avec des messages clairs:
+4. Committez avec des messages clairs :
    ```bash
    git commit -m "feat: ajouter extraction de nouveau document"
    ```
 
-5. Poussez et creez une Pull Request
+5. Poussez et créez une Pull Request
 
 ### Conventions de code
 
-- **Formatage**: Black (ligne max 100 caracteres)
-- **Linting**: Ruff
-- **Types**: Annotations de type obligatoires pour les fonctions publiques
-- **Tests**: Couverture minimale de 80%
-- **Docstrings**: Format Google pour les fonctions publiques
+- **Formatage** : Black (ligne max 100 caractères)
+- **Linting** : Ruff
+- **Types** : Annotations de type obligatoires pour les fonctions publiques
+- **Tests** : Couverture minimale de 80%
+- **Docstrings** : Format Google pour les fonctions publiques
 
 ### Structure des commits
 
-Utilisez les [Conventional Commits](https://www.conventionalcommits.org/):
+Utilisez les [Conventional Commits](https://www.conventionalcommits.org/) :
 
-- `feat:` nouvelle fonctionnalite
+- `feat:` nouvelle fonctionnalité
 - `fix:` correction de bug
 - `docs:` documentation
 - `refactor:` refactoring sans changement de comportement
 - `test:` ajout ou modification de tests
-- `chore:` maintenance (dependances, CI, etc.)
+- `chore:` maintenance (dépendances, CI, etc.)
 
 ## Questions ?
 
